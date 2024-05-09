@@ -48,7 +48,7 @@ export const FadeInImage = ({uri, style}: Props) => {
       <Animated.Image
         source={{uri}}
         onLoadEnd={ onLoadEnd }
-        style={[style, {opacity: animatedOpacity}]}
+        style={[style, {opacity: animatedOpacity, resizeMode: 'contain'}]}
       />
     </View>
   );

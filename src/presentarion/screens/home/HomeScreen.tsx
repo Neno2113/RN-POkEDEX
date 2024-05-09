@@ -1,4 +1,4 @@
-import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-query";
 import {  FlatList, StyleSheet, View } from "react-native";
 import { getPokemons } from "../../../actions/pokemons";
 import { PokeBallBG } from "../../components/ui/PokeBallBG";
@@ -10,6 +10,7 @@ import { PokemonCard } from "../../components/pokemons/PokemonCard";
 export const HomeScreen = () => {
 
   const { top } = useSafeAreaInsets()
+  const queryClient = useQueryClient();
 
   //Esta es la forma de una forma tradicional de peticion http
   // const { isLoading, data: pokemons = [],  } = useQuery({ 
@@ -21,9 +22,19 @@ export const HomeScreen = () => {
   const { isLoading, data, fetchNextPage  } = useInfiniteQuery({ 
     queryKey: ['pokemons', 'infinite'], 
     initialPageParam: 0,
-    queryFn: ( params ) => getPokemons(params.pageParam),
+    queryFn: async( params ) => {
+      const pokemons = await getPokemons(params.pageParam)
+      pokemons.forEach( pokemon => {
+        queryClient.setQueryData(['pokemon', pokemon.id], pokemon )
+      });
+
+      return pokemons;
+    },
     getNextPageParam: ( lastPage, pages ) => pages.length,
     staleTime: 1000 * 60 * 60,
+
+
+
   })
 
   
